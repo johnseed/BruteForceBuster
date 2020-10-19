@@ -13,6 +13,7 @@ namespace BruteForceBuster.Console
         const int BlockThreshold = 3;
         static void Main(string[] args)
         {
+            Console.WriteLine("Started");
             EventLogSubscription();
         }
 
@@ -27,13 +28,14 @@ namespace BruteForceBuster.Console
 </QueryList>";
 
                 EventLogQuery eventQuery = new EventLogQuery("Security", PathType.LogName, eventQueryString);
-                
+
                 using EventLogWatcher watcher = new EventLogWatcher(eventQuery);
                 watcher.EventRecordWritten += Watcher_EventRecordWritten;
                 watcher.Enabled = true;
-                
+
                 //EventLogReader logReader = new EventLogReader(eventQuery);
                 //EventRecord e = logReader.ReadEvent();
+                Console.ReadLine();
             }
             catch (EventLogReadingException e)
             {
