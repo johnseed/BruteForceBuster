@@ -6,6 +6,7 @@ namespace BruteForceBuster.Console
     using System.Collections.Generic;
     using System.Diagnostics.Eventing.Reader;
     using System.Linq;
+    using System.Runtime.InteropServices;
 
     class Program
     {
@@ -67,33 +68,40 @@ namespace BruteForceBuster.Console
 
             Type typeFWPolicy2 = Type.GetTypeFromProgID("HNetCfg.FwPolicy2");
             Type typeFWRule = Type.GetTypeFromProgID("HNetCfg.FwRule");
-            INetFwPolicy2 fwPolicy2 = (INetFwPolicy2)Activator.CreateInstance(typeFWPolicy2);
-            var rules = fwPolicy2.Rules.Cast<INetFwRule>();
-            var rule = rules.FirstOrDefault(x => x.Name == ruleName);
-            string newAddresses = string.Join(',', remoteAddresses);
-            if (rule is null)
+            try
             {
-                INetFwRule newRule = (INetFwRule)Activator.CreateInstance(typeFWRule);
-                newRule.Name = ruleName;
-                newRule.Description = "Block inbound traffic over TCP port 3389";
-                newRule.Protocol = (int)NET_FW_IP_PROTOCOL_.NET_FW_IP_PROTOCOL_TCP;
-                newRule.LocalPorts = "3389";
-                newRule.RemoteAddresses = newAddresses;
-                newRule.Direction = NET_FW_RULE_DIRECTION_.NET_FW_RULE_DIR_IN;
-                newRule.Enabled = true;
-                newRule.Grouping = "@firewallapi.dll,-23255";
-                newRule.Profiles = fwPolicy2.CurrentProfileTypes;
-                newRule.Action = NET_FW_ACTION_.NET_FW_ACTION_BLOCK;
-                fwPolicy2.Rules.Add(newRule);
-            }
-            else
-            {
-                rule.RemoteAddresses += $",{newAddresses}";
-            }
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine($"Blocked! IP : {newAddresses}");
-            Console.ResetColor();
 
+                INetFwPolicy2 fwPolicy2 = (INetFwPolicy2)Activator.CreateInstance(typeFWPolicy2);
+                var rules = fwPolicy2.Rules.Cast<INetFwRule>();
+                var rule = rules.FirstOrDefault(x => x.Name == ruleName);
+                string newAddresses = string.Join(',', remoteAddresses);
+                if (rule is null)
+                {
+                    INetFwRule newRule = (INetFwRule)Activator.CreateInstance(typeFWRule);
+                    newRule.Name = ruleName;
+                    newRule.Description = "Block inbound traffic over TCP port 3389";
+                    newRule.Protocol = (int)NET_FW_IP_PROTOCOL_.NET_FW_IP_PROTOCOL_TCP;
+                    newRule.LocalPorts = "3389";
+                    newRule.RemoteAddresses = newAddresses;
+                    newRule.Direction = NET_FW_RULE_DIRECTION_.NET_FW_RULE_DIR_IN;
+                    newRule.Enabled = true;
+                    newRule.Grouping = "@firewallapi.dll,-23255";
+                    newRule.Profiles = fwPolicy2.CurrentProfileTypes;
+                    newRule.Action = NET_FW_ACTION_.NET_FW_ACTION_BLOCK;
+                    fwPolicy2.Rules.Add(newRule);
+                }
+                else
+                {
+                    rule.RemoteAddresses += $",{newAddresses}";
+                }
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"Blocked! IP : {newAddresses}");
+                Console.ResetColor();
+            }
+            catch (COMException ex)
+            {
+                Console.WriteLine(ex);
+            }
         }
     }
 }
