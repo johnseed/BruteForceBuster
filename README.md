@@ -1,3 +1,4 @@
+[![CodeFactor](https://www.codefactor.io/repository/github/johnseed/bruteforcebuster/badge)](https://www.codefactor.io/repository/github/johnseed/bruteforcebuster)
 # BruteForceBuster
 Very simple tool, Block RDP brute force attacker's ip  
 How it works : 
