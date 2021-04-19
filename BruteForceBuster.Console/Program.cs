@@ -55,7 +55,7 @@ namespace BruteForceBuster.Console
                 IPDict.TryGetValue(ip, out int count);
                 IPDict[ip] = ++count;
 
-                Console.WriteLine($"Account Name : {accountName}, Source Network Address : {ip}, Count : {count}");
+                Console.WriteLine($"Account Name : {accountName}, Source Network Address : {ip}, Count : {count}, Time : {DateTime.Now}");
 
                 if (count >= BlockThreshold)
                     BlockIP(ip);
