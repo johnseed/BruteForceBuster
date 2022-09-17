@@ -51,11 +51,12 @@ namespace BruteForceBuster.Console
             {
                 string accountName = e.EventRecord.Properties[5].Value.ToString();
                 string ip = e.EventRecord.Properties[19].Value.ToString();
-
+                string port = e.EventRecord.Properties[20].Value.ToString();
+                string type = port == "0" ? "RDP" : $"SMB source port : {port}";
                 IPDict.TryGetValue(ip, out int count);
                 IPDict[ip] = ++count;
 
-                Console.WriteLine($"Account Name : {accountName}, Source Network Address : {ip}, Count : {count}, Time : {DateTime.Now}");
+                Console.WriteLine($"Account Name : {accountName}, Source Network Address : {ip}, Count : {count}, Time : {DateTime.Now}, Type : {type}");
 
                 if (count >= BlockThreshold)
                     BlockIP(ip);
@@ -81,7 +82,7 @@ namespace BruteForceBuster.Console
                     newRule.Name = ruleName;
                     newRule.Description = "Block inbound traffic over TCP port 3389";
                     newRule.Protocol = (int)NET_FW_IP_PROTOCOL_.NET_FW_IP_PROTOCOL_TCP;
-                    newRule.LocalPorts = "3389";
+                    newRule.LocalPorts = "3389,445,135,139";
                     newRule.RemoteAddresses = newAddresses;
                     newRule.Direction = NET_FW_RULE_DIRECTION_.NET_FW_RULE_DIR_IN;
                     newRule.Enabled = true;
